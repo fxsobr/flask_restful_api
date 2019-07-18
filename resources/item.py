@@ -26,7 +26,7 @@ class Item(Resource):
 
     def post(self, name):
         if ItemModel.find_by_name(name):
-            return {'message': "An item with name '{}' already exists.".format(name)}
+            return {'message': "An item with name '{}' already exists.".format(name)}, 400
 
         data = Item.parser.parse_args()
 
@@ -44,8 +44,8 @@ class Item(Resource):
         item = ItemModel.find_by_name(name)
         if item:
             item.delete_from_db()
-
-        return {'message': 'Item deleted'}
+            return {'message': 'Item deleted'}
+        return {'message': 'Item not found.'}, 404
 
     @jwt_required()
     def put(self, name):
@@ -63,5 +63,5 @@ class Item(Resource):
 
 class ItemList(Resource):
     def get(self):
-        return {'items': list(map(lambda x: x.json(), ItemModel.query.all()))}
+        return {'items': [x.json() for x in ItemModel.find_all()]}
 
